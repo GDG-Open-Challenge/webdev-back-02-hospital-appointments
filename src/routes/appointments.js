@@ -42,6 +42,24 @@ router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
 
+    if (new Date(appointmentDate) <= new Date()) {
+      return res.status(400).json({
+        message: 'Appointment must be scheduled in the future'
+      });
+    }
+
+    const conflict = await Appointment.findOne({
+      doctor,
+      appointmentDate,
+      status: { $ne: 'cancelled' }
+    });
+
+    if (conflict) {
+      return res.status(400).json({
+        message: 'Doctor already has an appointment at this time'
+      });
+    }
+
     const appointment = new Appointment({
       patient,
       doctor,
@@ -53,6 +71,7 @@ router.post('/', async (req, res) => {
 
     const saved = await appointment.save();
     res.status(201).json(saved);
+
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
