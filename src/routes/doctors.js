@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Doctor = require('../models/Doctor');
 const Hospital = require('../models/Hospital');
@@ -44,6 +45,16 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { firstName, lastName, email, phone, licenseNumber, specialization, hospital } = req.body;
+    if (hospital) {
+      if (!mongoose.Types.ObjectId.isValid(hospital)) {
+        return res.status(400).json({ message: 'Invalid hospital id.' });
+      }
+
+      const hospitalExists = await Hospital.exists({ _id: hospital });
+      if (!hospitalExists) {
+        return res.status(400).json({ message: 'Hospital not found.' });
+      }
+    }
 
     const doctor = new Doctor({
       firstName,

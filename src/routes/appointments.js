@@ -41,13 +41,46 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
+    const parsedAppointmentDate = new Date(appointmentDate);
+    const parsedDuration = Number(duration);
+    const appointmentDuration = Number.isFinite(parsedDuration) && parsedDuration > 0 ? parsedDuration : 30;
+
+    if (Number.isNaN(parsedAppointmentDate.getTime())) {
+      return res.status(400).json({ message: 'Invalid appointmentDate. Use a valid date/time.' });
+    }
+
+    if (parsedAppointmentDate <= new Date()) {
+      return res.status(400).json({ message: 'appointmentDate must be in the future.' });
+    }
+
+    const requestedEndDate = new Date(
+      parsedAppointmentDate.getTime() + appointmentDuration * 60 * 1000
+    );
+
+    const conflictingAppointment = await Appointment.findOne({
+      doctor,
+      status: 'scheduled',
+      appointmentDate: { $lt: requestedEndDate },
+      $expr: {
+        $gt: [
+          { $add: ['$appointmentDate', { $multiply: ['$duration', 60 * 1000] }] },
+          parsedAppointmentDate,
+        ],
+      },
+    });
+
+    if (conflictingAppointment) {
+      return res.status(409).json({
+        message: 'Doctor is not available at the requested time. Please choose another slot.',
+      });
+    }
 
     const appointment = new Appointment({
       patient,
       doctor,
       hospital,
-      appointmentDate,
-      duration: duration || 30,
+      appointmentDate: parsedAppointmentDate,
+      duration: appointmentDuration,
       reason,
     });
 
@@ -85,6 +118,8 @@ router.delete('/:id', async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
+
+    res.json({ message: 'Appointment cancelled successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

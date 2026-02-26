@@ -21,6 +21,11 @@ const doctorSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      trim: true,
+      match: [
+        /^\+?[1-9]\d{9,14}$/,
+        'Phone number must be 10-15 digits and may include a leading + (E.164 format).',
+      ],
     },
     licenseNumber: {
       type: String,
