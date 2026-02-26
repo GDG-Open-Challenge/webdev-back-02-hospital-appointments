@@ -20,7 +20,9 @@ const doctorSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
+      required: [true, 'Phone number is required'],
+      trim: true,
+      match: [/^(\+1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/, 'Invalid phone format']
     },
     licenseNumber: {
       type: String,
