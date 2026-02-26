@@ -42,6 +42,18 @@ router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
 
+    const conflict = await Appointment.findOne({
+      doctor: doctor,
+      appointmentDate: appointmentDate,
+      status: { $ne: 'cancelled' } 
+    });
+
+    if (conflict) {
+      return res.status(400).json({ 
+        message: 'This doctor is already booked for this date and time.' 
+      });
+    }
+      
     const appointment = new Appointment({
       patient,
       doctor,
