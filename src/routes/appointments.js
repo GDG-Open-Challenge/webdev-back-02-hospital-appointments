@@ -42,6 +42,17 @@ router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
 
+    const existingappointment = await Appointment.findOne({ doctor, appointmentDate });
+    if (existingappointment) {
+      return res.status(400).json({ message: 'Doctor is already booked at this time' });
+    }
+
+    const appointmentDateTime = new Date(appointmentDate);
+    const now = new Date();
+    if (appointmentDateTime < now) {
+      return res.status(400).json({ message: 'Appointment date must be in the future' });
+    }
+
     const appointment = new Appointment({
       patient,
       doctor,
@@ -54,6 +65,7 @@ router.post('/', async (req, res) => {
     const saved = await appointment.save();
     res.status(201).json(saved);
   } catch (error) {
+
     res.status(400).json({ message: error.message });
   }
 });
@@ -85,6 +97,7 @@ router.delete('/:id', async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
+    res.json({ message: 'Appointment cancelled successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

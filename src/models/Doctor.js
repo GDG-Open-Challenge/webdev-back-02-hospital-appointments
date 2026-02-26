@@ -21,6 +21,7 @@ const doctorSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      match: [/^\d{10}$/,'Invalid phone number ']
     },
     licenseNumber: {
       type: String,

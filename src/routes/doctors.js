@@ -44,6 +44,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { firstName, lastName, email, phone, licenseNumber, specialization, hospital } = req.body;
+    const existingHospital = await Hospital.findById(hospital);
+    if (!existingHospital) {
+      return res.status(400).json({ message: 'Invalid hospital ID' });
+    }
 
     const doctor = new Doctor({
       firstName,
