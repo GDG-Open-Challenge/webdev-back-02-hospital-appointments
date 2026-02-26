@@ -45,6 +45,16 @@ router.post('/', async (req, res) => {
   try {
     const { firstName, lastName, email, phone, licenseNumber, specialization, hospital } = req.body;
 
+    if (hospital) {
+      const hospitalExists = await Hospital.findById(hospital);
+
+      if (!hospitalExists) {
+        return res.status(400).json({
+          message: 'Hospital not found'
+        });
+      }
+    }
+
     const doctor = new Doctor({
       firstName,
       lastName,
