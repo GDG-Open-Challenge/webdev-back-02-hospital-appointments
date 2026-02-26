@@ -65,6 +65,7 @@ router.post('/', async (req, res) => {
     const saved = await appointment.save();
     res.status(201).json(saved);
   } catch (error) {
+
     res.status(400).json({ message: error.message });
   }
 });
@@ -96,6 +97,7 @@ router.delete('/:id', async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
+    res.json({ message: 'Appointment cancelled successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
