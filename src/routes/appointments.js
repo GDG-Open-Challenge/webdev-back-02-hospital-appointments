@@ -42,6 +42,11 @@ router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
 
+    const existingappointment = await Appointment.findOne({ doctor, appointmentDate });
+    if (existingappointment) {
+      return res.status(400).json({ message: 'Doctor is already booked at this time' });
+    }
+
     const appointmentDateTime = new Date(appointmentDate);
     const now = new Date();
     if (appointmentDateTime < now) {
