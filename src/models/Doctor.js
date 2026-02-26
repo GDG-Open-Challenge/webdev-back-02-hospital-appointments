@@ -21,6 +21,7 @@ const doctorSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      match:[/^[6-9][0-9]{9}$/,"Please eneter a valid number"]
     },
     licenseNumber: {
       type: String,
