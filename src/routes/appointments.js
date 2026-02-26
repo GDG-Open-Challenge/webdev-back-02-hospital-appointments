@@ -41,12 +41,21 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
+    const parsedAppointmentDate = new Date(appointmentDate);
+
+    if (Number.isNaN(parsedAppointmentDate.getTime())) {
+      return res.status(400).json({ message: 'Invalid appointmentDate. Use a valid date/time.' });
+    }
+
+    if (parsedAppointmentDate <= new Date()) {
+      return res.status(400).json({ message: 'appointmentDate must be in the future.' });
+    }
 
     const appointment = new Appointment({
       patient,
       doctor,
       hospital,
-      appointmentDate,
+      appointmentDate: parsedAppointmentDate,
       duration: duration || 30,
       reason,
     });
