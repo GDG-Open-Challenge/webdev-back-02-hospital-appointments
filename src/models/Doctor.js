@@ -19,9 +19,17 @@ const doctorSchema = new mongoose.Schema(
       unique: true,
     },
     phone: {
-      type: String,
-      required: true,
+  type: String,
+  required: true,
+  trim: true,
+  validate: {
+    validator: function (v) {
+      return /^\+[1-9]\d{1,14}$/.test(v);
     },
+    message: (props) =>
+      `${props.value} is not a valid phone number. Use E.164 format (e.g., +919876543210).`,
+  },
+},
     licenseNumber: {
       type: String,
       required: true,
