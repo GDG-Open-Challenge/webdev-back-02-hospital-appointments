@@ -42,6 +42,12 @@ router.post('/', async (req, res) => {
   try {
     const { patient, doctor, hospital, appointmentDate, duration, reason } = req.body;
 
+    if (new Date(appointmentDate) <= new Date()) {
+      return res.status(400).json({
+        message: 'Appointment must be scheduled in the future'
+      });
+    }
+
     const appointment = new Appointment({
       patient,
       doctor,
