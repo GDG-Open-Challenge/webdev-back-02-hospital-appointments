@@ -21,6 +21,7 @@ const doctorSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      match: [/^\d{10}$/, 'Provide a valid 10 digit phone number.'] // validation to check invalid ph no.
     },
     licenseNumber: {
       type: String,
