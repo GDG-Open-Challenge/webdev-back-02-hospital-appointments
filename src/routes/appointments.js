@@ -89,6 +89,13 @@ router.delete('/:id', async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
+
+    res.json({ 
+      success: true, 
+      message: 'Appointment cancelled successfully',
+      id: req.params.id 
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
